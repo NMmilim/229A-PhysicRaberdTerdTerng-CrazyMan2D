@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 1701187574368030398}
   m_Layer: 0
   m_Name: 40mmHEDP
-  m_TagString: Untagged
+  m_TagString: Grenade
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,7 +143,7 @@ Rigidbody2D:
   m_LinearDamping: 0.25
   m_AngularDamping: 0.3
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: cdc10562503684e42a7bed2a966a5e5e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

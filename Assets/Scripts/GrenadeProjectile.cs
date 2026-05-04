@@ -96,12 +96,27 @@ public class GrenadeProjectile : MonoBehaviour
         if (exploded) return;
         exploded = true;
 
+        GameObject explosion = new GameObject("Explosion");
+        CircleCollider2D col = explosion.AddComponent<CircleCollider2D>();
+
+        col.isTrigger = true;
+        col.radius = explosionRadius;
+
+        explosion.tag = "Explosion";
+
+        explosion.transform.position = transform.position;
+
+        Destroy(explosion, 0.05f);
+
+        // VFX
         if (explosionVFX)
             Instantiate(explosionVFX, transform.position, Quaternion.identity);
 
+        // Sound
         if (explosionSound)
             AudioSource.PlayClipAtPoint(explosionSound, transform.position);
 
+        // Physics force
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
 
         foreach (var hit in hits)
