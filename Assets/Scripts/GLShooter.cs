@@ -7,11 +7,11 @@ public class GrenadeLauncher2D : MonoBehaviour
     [Header("Setup")]
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject grenadePrefab;
+    [SerializeField] private UI_Gun ui;
 
     private Camera cam;
 
     [Header("Input")]
-    [SerializeField] private InputActionReference aim;
     [SerializeField] private InputActionReference fire;
     [SerializeField] private InputActionReference reload;
 
@@ -32,7 +32,11 @@ public class GrenadeLauncher2D : MonoBehaviour
 
     private Vector2 mouseScreenPos;
 
- void Awake()
+    public int CurrentAmmo => currentAmmo;
+    public int MagazineSize => magazineSize;
+    public bool IsReloading => isReloading;
+
+    void Awake()
 {
     cam = Camera.main;
     audioSource = GetComponent<AudioSource>();
@@ -52,26 +56,25 @@ public class GrenadeLauncher2D : MonoBehaviour
     {
         // IMPORTANT: initialize ammo
         currentAmmo = magazineSize;
+
+        if (ui != null)
+            ui.UpdateAmmo(currentAmmo, magazineSize);
     }
 
     void OnEnable()
     {
-        aim.action.Enable();
         fire.action.Enable();
         reload.action.Enable();
 
-        aim.action.performed += OnAim;
         fire.action.performed += OnFire;
         reload.action.performed += OnReload;
     }
 
     void OnDisable()
     {
-        aim.action.performed -= OnAim;
         fire.action.performed -= OnFire;
         reload.action.performed -= OnReload;
 
-        aim.action.Disable();
         fire.action.Disable();
         reload.action.Disable();
     }
@@ -83,10 +86,7 @@ public class GrenadeLauncher2D : MonoBehaviour
 
     // ---------------- INPUT ----------------
 
-    void OnAim(InputAction.CallbackContext ctx)
-    {
-        mouseScreenPos = ctx.ReadValue<Vector2>();
-    }
+  
 
     void OnFire(InputAction.CallbackContext ctx)
     {
@@ -135,6 +135,9 @@ public class GrenadeLauncher2D : MonoBehaviour
 
         currentAmmo--;
 
+        if (ui != null)
+            ui.UpdateAmmo(currentAmmo, magazineSize);
+
         Fire();
 
         yield return new WaitForSeconds(fireRate);
@@ -146,24 +149,13 @@ public class GrenadeLauncher2D : MonoBehaviour
     {
         audioSource.PlayOneShot(fireSound);
 
-        Vector3 mouseWorld = cam.ScreenToWorldPoint(mouseScreenPos);
-        mouseWorld.z = 0f;
-
-        Vector2 direction = firePoint.right;
-
-        // IMPORTANT: prevent zero direction
-        if (direction.sqrMagnitude < 0.01f)
-            direction = firePoint.right;
-
-        direction.Normalize();
-
         GameObject grenade = Instantiate(grenadePrefab, firePoint.position, firePoint.rotation);
 
         Rigidbody2D rb = grenade.GetComponent<Rigidbody2D>();
 
-        // stronger, more consistent launch
-        Vector2 dir = direction.normalized;
-        rb.linearVelocity = dir * muzzleVelocity;
+        Vector2 dir = firePoint.right.normalized;
+
+        rb.linearVelocity = dir * muzzleVelocity;   // correct for 2D physics
     }
 
     // ---------------- RELOAD ----------------
@@ -173,19 +165,26 @@ public class GrenadeLauncher2D : MonoBehaviour
         if (isReloading || currentAmmo == magazineSize) return;
 
         StartCoroutine(ReloadRoutine());
+
+        if (ui != null)
+            ui.SetReloading(true);
     }
 
     IEnumerator ReloadRoutine()
     {
         isReloading = true;
 
-
-
         audioSource.PlayOneShot(reloadSound);
 
         yield return new WaitForSeconds(reloadTime);
 
         currentAmmo = magazineSize;
+
+        if (ui != null)
+        {
+            ui.UpdateAmmo(currentAmmo, magazineSize);
+            ui.SetReloading(false);
+        }
 
         isReloading = false;
     }

@@ -26,42 +26,31 @@ public class CrosshairUI : MonoBehaviour
     {
         if (Mouse.current == null) return;
 
-        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Vector2 mouseScreen = Mouse.current.position.ReadValue();
 
-        // Convert mouse to UI local position
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform,
-            mousePos,
-            canvas.worldCamera,
-            out Vector2 mouseLocal
-        );
-
-        // Convert player world position -> screen -> UI local
         Vector2 playerScreen = cam.WorldToScreenPoint(player.position);
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform,
-            playerScreen,
-            canvas.worldCamera,
-            out Vector2 playerLocal
-        );
+        Vector2 dir = mouseScreen - playerScreen;
 
-        // Direction from player -> mouse
-        Vector2 dir = mouseLocal - playerLocal;
-
-        if (dir.sqrMagnitude < 0.0001f)
+        if (dir.sqrMagnitude < 0.001f)
             dir = Vector2.right;
 
         Vector2 dirNormalized = dir.normalized;
 
         float distance = Mathf.Clamp(dir.magnitude, minDistance, maxDistance);
 
-        Vector2 targetPos = playerLocal + dirNormalized * distance;
+        Vector2 targetScreenPos = playerScreen + dirNormalized * distance;
 
-        // Smooth movement
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            targetScreenPos,
+            canvas.worldCamera,
+            out Vector2 targetLocal
+        );
+
         rectTransform.localPosition = Vector2.Lerp(
             rectTransform.localPosition,
-            targetPos,
+            targetLocal,
             smoothSpeed * Time.deltaTime
         );
     }

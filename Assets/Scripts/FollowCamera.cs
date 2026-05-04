@@ -5,7 +5,7 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] Transform target;
     [SerializeField] float smoothSpeed = 5f;
     [SerializeField] Vector3 offset = new Vector3(0, 4, -10);
-    [SerializeField] float verticalOffset = 2f;
+   // [SerializeField] float verticalOffset = 2f;
     [SerializeField] float lookAhead = 2f;
     [SerializeField] float minX, maxX, minY, maxY;
     [SerializeField] float maxLookDistance = 5f;
@@ -28,38 +28,13 @@ public class CameraFollow : MonoBehaviour
 
         Vector3 mouseWorld = GetMouseWorld();
 
-        // Direction from player to mouse
-        Vector3 dir = Vector3.ClampMagnitude(mouseWorld - target.position, maxLookDistance);
+        Vector3 dir = mouseWorld - target.position;
+        dir = Vector3.ClampMagnitude(dir, maxLookDistance);
 
-        // LookAhead movement
-        Vector3 aimOffset = dir * lookAhead;
+        Vector3 desiredPosition = target.position + offset + dir * lookAhead;
 
-        Vector3 desiredPosition = target.position
-                                + aimOffset
-                                + offset
-                                + new Vector3(0, verticalOffset, 0);
 
-        // Clamp to MAP bounds (with camera size)
-        float camHeight = Camera.main.orthographicSize;
-        float camWidth = camHeight * Camera.main.aspect;
 
-        desiredPosition.x = Mathf.Clamp(desiredPosition.x, minX + camWidth, maxX - camWidth);
-        desiredPosition.y = Mathf.Clamp(desiredPosition.y, minY + camHeight, maxY - camHeight);
-
-        // Clamp camera so it DOESN’T go past cursor
-        desiredPosition.x = Mathf.Clamp(
-            desiredPosition.x,
-            Mathf.Min(target.position.x, mouseWorld.x),
-            Mathf.Max(target.position.x, mouseWorld.x)
-        );
-
-        desiredPosition.y = Mathf.Clamp(
-            desiredPosition.y,
-            Mathf.Min(target.position.y, mouseWorld.y),
-            Mathf.Max(target.position.y, mouseWorld.y)
-        );
-
-        // Smooth follow
         transform.position = Vector3.Lerp(
             transform.position,
             desiredPosition,
