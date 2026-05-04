@@ -24,7 +24,7 @@ public class GunAim : MonoBehaviour
         if (Mouse.current == null) return;
 
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
-        Vector3 mouseWorld = cam.ScreenToWorldPoint(mouseScreen);
+        Vector3 mouseWorld = cam.ScreenToWorldPoint(new Vector3(mouseScreen.x, mouseScreen.y, -cam.transform.position.z));
         mouseWorld.z = 0f;
 
         Vector2 dir = mouseWorld - transform.position;
