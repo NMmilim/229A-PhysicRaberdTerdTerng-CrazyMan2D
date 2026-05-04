@@ -15,7 +15,6 @@ public class UI_Gun : MonoBehaviour
 
     void Start()
     {
-        ammoText.text = string.Empty;
         reloadText.gameObject.SetActive(false);
     }
 
@@ -32,14 +31,25 @@ public class UI_Gun : MonoBehaviour
         reloadText.gameObject.SetActive(state);
 
         if (state)
+        {
             reloadText.text = "RELOADING...";
+        }
     }
 
     void Update()
     {
+        // RELOADING EFFECT (highest priority)
         if (isReloading)
+        {
+            reloadText.color = Color.Lerp(
+                Color.red,
+                Color.white,
+                Mathf.PingPong(Time.time * 5f, 1f)
+            );
             return;
+        }
 
+        // LOW AMMO EFFECT
         if (isLowAmmo)
         {
             ammoText.color = Color.Lerp(

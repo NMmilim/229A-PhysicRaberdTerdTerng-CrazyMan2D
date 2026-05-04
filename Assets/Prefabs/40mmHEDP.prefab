@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 1701187574368030398}
   m_Layer: 0
   m_Name: 40mmHEDP
-  m_TagString: Untagged
+  m_TagString: Grenade
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -139,11 +139,11 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 3
-  m_LinearDamping: 0.5
-  m_AngularDamping: 3
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Mass: 2
+  m_LinearDamping: 0.25
+  m_AngularDamping: 0.3
+  m_GravityScale: 3
+  m_Material: {fileID: 6200000, guid: cdc10562503684e42a7bed2a966a5e5e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -282,6 +282,7 @@ MonoBehaviour:
   explosionSound: {fileID: 8300000, guid: 5dfc249337d532c46a13690953e0c225, type: 3}
   impactSound: {fileID: 8300000, guid: 9deeb7e8c7fc0ab40b2ee6801517beba, type: 3}
   audioSource: {fileID: 1701187574368030398}
+  airResistance: 0.015
 --- !u!82 &1701187574368030398
 AudioSource:
   m_ObjectHideFlags: 0

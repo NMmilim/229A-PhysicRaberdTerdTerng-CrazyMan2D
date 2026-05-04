@@ -19,6 +19,10 @@ public class GrenadeProjectile : MonoBehaviour
     [SerializeField] private AudioClip impactSound;
     [SerializeField] private AudioSource audioSource;
 
+
+    [Header("Air Resistance")]
+    [SerializeField] private float airResistance = 0.015f;
+
     private Rigidbody2D rb;
 
     private bool armed;
@@ -74,18 +78,45 @@ public class GrenadeProjectile : MonoBehaviour
 
         Destroy(gameObject);
     }
+    void FixedUpdate()
+    {
+        if (rb == null || exploded) return;
+
+        Vector2 v = rb.linearVelocity;
+
+        // Only reduce horizontal speed (keeps natural arc)
+        Vector2 horizontal = new Vector2(v.x, 0f);
+        horizontal *= (1f - airResistance);
+
+        rb.linearVelocity = new Vector2(horizontal.x, v.y);
+    }
 
     void Explode()
     {
         if (exploded) return;
         exploded = true;
 
+        GameObject explosion = new GameObject("Explosion");
+        CircleCollider2D col = explosion.AddComponent<CircleCollider2D>();
+
+        col.isTrigger = true;
+        col.radius = explosionRadius;
+
+        explosion.tag = "Explosion";
+
+        explosion.transform.position = transform.position;
+
+        Destroy(explosion, 0.05f);
+
+        // VFX
         if (explosionVFX)
             Instantiate(explosionVFX, transform.position, Quaternion.identity);
 
+        // Sound
         if (explosionSound)
             AudioSource.PlayClipAtPoint(explosionSound, transform.position);
 
+        // Physics force
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
 
         foreach (var hit in hits)
