@@ -19,6 +19,10 @@ public class GrenadeProjectile : MonoBehaviour
     [SerializeField] private AudioClip impactSound;
     [SerializeField] private AudioSource audioSource;
 
+
+    [Header("Air Resistance")]
+    [SerializeField] private float airResistance = 0.015f;
+
     private Rigidbody2D rb;
 
     private bool armed;
@@ -73,6 +77,18 @@ public class GrenadeProjectile : MonoBehaviour
         yield return new WaitForSeconds(unarmedDestroyDelay);
 
         Destroy(gameObject);
+    }
+    void FixedUpdate()
+    {
+        if (rb == null || exploded) return;
+
+        Vector2 v = rb.linearVelocity;
+
+        // Only reduce horizontal speed (keeps natural arc)
+        Vector2 horizontal = new Vector2(v.x, 0f);
+        horizontal *= (1f - airResistance);
+
+        rb.linearVelocity = new Vector2(horizontal.x, v.y);
     }
 
     void Explode()

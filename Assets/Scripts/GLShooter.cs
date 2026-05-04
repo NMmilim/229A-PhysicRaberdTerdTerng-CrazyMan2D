@@ -153,9 +153,12 @@ public class GrenadeLauncher2D : MonoBehaviour
 
         Rigidbody2D rb = grenade.GetComponent<Rigidbody2D>();
 
-        Vector2 dir = firePoint.right.normalized;
+        Vector2 direction = firePoint.right.normalized;
 
-        rb.linearVelocity = dir * muzzleVelocity;   // correct for 2D physics
+        // slight upward bias for ballistic arc feel
+        Vector2 launchDir = (direction + Vector2.up * 0.05f).normalized;
+
+        rb.AddForce(launchDir * muzzleVelocity, ForceMode2D.Impulse);
     }
 
     // ---------------- RELOAD ----------------
