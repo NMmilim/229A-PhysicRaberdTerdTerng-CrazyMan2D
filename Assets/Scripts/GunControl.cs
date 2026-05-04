@@ -10,6 +10,7 @@ public class GunAim : MonoBehaviour
 
     [SerializeField] float minAngle = -60f;
     [SerializeField] float maxAngle = 60f;
+    bool isAiming;
 
     Camera cam;
 
