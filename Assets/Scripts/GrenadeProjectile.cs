@@ -1,8 +1,10 @@
 using UnityEngine;
-using System.Collections;
 
 public class GrenadeProjectile : MonoBehaviour
 {
+    [Header("Lifetime Safety")]
+    [SerializeField] private float maxLifeTime = 5f;
+
     [Header("VFX")]
     [SerializeField] private GameObject explosionVFX;
 
@@ -12,19 +14,16 @@ public class GrenadeProjectile : MonoBehaviour
     [SerializeField] private AudioClip impactSound;
 
     [Header("Explosion")]
-    [SerializeField] private float fuseTime = 2f;
     [SerializeField] private float explosionRadius = 2.5f;
     [SerializeField] private float explosionForce = 700f;
 
-    [Header("Arming")]
-    [SerializeField] private float armingTime = 0.2f;
+    [Header("Safety")]
+    [SerializeField] private float minImpactSpeed = 4f;
+    [SerializeField] private float armTime = 0.1f;
 
     private Rigidbody2D rb;
-    private bool armed;
     private bool exploded;
-    private bool canExplode;
-
-    Coroutine fuseRoutine;
+    private float spawnTime;
 
     void Awake()
     {
@@ -34,44 +33,33 @@ public class GrenadeProjectile : MonoBehaviour
 
     void Start()
     {
-        armed = false;
-        canExplode = false;
-
-        Invoke(nameof(Arm), armingTime);
-        StartCoroutine(Fuse());
+        spawnTime = Time.time;
+        Invoke(nameof(AutoDestroy), maxLifeTime);
     }
-
-    void Arm()
+    void AutoDestroy()
     {
-        armed = true;
-        canExplode = true;
+        if (!exploded)
+        {
+            Destroy(gameObject, 0.25f);
+        }
     }
-
-    IEnumerator Fuse()
-    {
-        yield return new WaitForSeconds(fuseTime);
-
-        if (canExplode)
-            Explode();
-    }
-
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!canExplode || exploded) return;
+        if (exploded) return;
+
+        // ignore very early collision (spawn overlap fix)
+        if (Time.time - spawnTime < armTime) return;
 
         float impactSpeed = collision.relativeVelocity.magnitude;
 
-        bool isGround = collision.collider.CompareTag("Ground");
-        bool isPlayer = collision.collider.CompareTag("Player");
-
-        // Only play sound on real impact
-        if (impactSpeed > 2f)
+        // play impact sound only if real hit
+        if (impactSpeed > 2f && impactSound != null)
         {
             audioSource.PlayOneShot(impactSound);
         }
 
-        // explosion trigger
-        if (isPlayer)
+        // safety check: only explode if impact is strong enough
+        if (impactSpeed >= minImpactSpeed)
         {
             Explode();
         }
@@ -79,33 +67,29 @@ public class GrenadeProjectile : MonoBehaviour
 
     void Explode()
     {
-        if (exploded || !armed) return;
-
+        if (exploded) return;
         exploded = true;
 
-        CancelInvoke();
+        CancelInvoke(); // stop AutoDestroy
 
         // VFX
-        Instantiate(explosionVFX, transform.position, Quaternion.identity);
+        if (explosionVFX != null)
+            Instantiate(explosionVFX, transform.position, Quaternion.identity);
 
-        // spawn sound object so it is NOT destroyed with grenade
-        GameObject audioObj = new GameObject("ExplosionSound");
-        AudioSource src = audioObj.AddComponent<AudioSource>();
-
-        src.clip = explosionSound;
-        src.spatialBlend = 1f; // 3D sound
-        src.Play();
-
-        Destroy(audioObj, explosionSound.length);
-
-        // physics
-        if (rb != null)
+        // Sound (safe 3D)
+        if (explosionSound != null)
         {
-            rb.simulated = false;
-            rb.linearVelocity = Vector2.zero;
+            GameObject audioObj = new GameObject("ExplosionSound");
+            AudioSource src = audioObj.AddComponent<AudioSource>();
+
+            src.clip = explosionSound;
+            src.spatialBlend = 1f;
+            src.Play();
+
+            Destroy(audioObj, explosionSound.length);
         }
 
-        // explosion force
+        // physics explosion
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
 
         foreach (var hit in hits)
@@ -119,12 +103,12 @@ public class GrenadeProjectile : MonoBehaviour
             }
         }
 
-        Destroy(gameObject, 0.05f);
-    }
+        if (rb != null)
+        {
+            rb.simulated = false;
+            rb.linearVelocity = Vector2.zero;
+        }
 
-    void OnDisable()
-    {
-        if (fuseRoutine != null)
-            StopCoroutine(fuseRoutine);
+        Destroy(gameObject, 0.05f);
     }
 }

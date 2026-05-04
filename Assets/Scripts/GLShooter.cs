@@ -32,21 +32,21 @@ public class GrenadeLauncher2D : MonoBehaviour
 
     private Vector2 mouseScreenPos;
 
-    void Awake()
+ void Awake()
+{
+    cam = Camera.main;
+    audioSource = GetComponent<AudioSource>();
+
+    if (audioSource == null)
     {
-        cam = Camera.main;
-        audioSource = GetComponent<AudioSource>();
-
-        if (audioSource == null)
-        {
-            audioSource = GetComponentInChildren<AudioSource>();
-        }
-
-        if (audioSource == null)
-        {
-            Debug.LogError("NO AudioSource found on Gun or children!");
-        }
+        audioSource = GetComponentInChildren<AudioSource>();
     }
+
+    if (audioSource == null)
+    {
+        Debug.LogError("NO AudioSource found on Gun or children!");
+    }
+}
 
     void Start()
     {
@@ -108,7 +108,6 @@ public class GrenadeLauncher2D : MonoBehaviour
         mouseWorld.z = 0;
 
         Vector2 direction = firePoint.right;
-
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         firePoint.rotation = Quaternion.Euler(0, 0, angle);
     }
@@ -158,7 +157,7 @@ public class GrenadeLauncher2D : MonoBehaviour
 
         direction.Normalize();
 
-        GameObject grenade = Instantiate(grenadePrefab, firePoint.position, Quaternion.identity);
+        GameObject grenade = Instantiate(grenadePrefab, firePoint.position, firePoint.rotation);
 
         Rigidbody2D rb = grenade.GetComponent<Rigidbody2D>();
 

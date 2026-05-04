@@ -242,14 +242,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7d15f8e28e4fd4419542683b16a979e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrenadeProjectile
+  maxLifeTime: 5
   explosionVFX: {fileID: 218747529111575265, guid: 4f50e5456f96a604b8b7ad2e58e2b832, type: 3}
   audioSource: {fileID: 1701187574368030398}
   explosionSound: {fileID: 8300000, guid: 5dfc249337d532c46a13690953e0c225, type: 3}
   impactSound: {fileID: 8300000, guid: 9deeb7e8c7fc0ab40b2ee6801517beba, type: 3}
-  fuseTime: 2
-  explosionRadius: 2.5
-  explosionForce: 700
-  armingTime: 0.1
+  explosionRadius: 5
+  explosionForce: 1500
+  minImpactSpeed: 7
+  armTime: 0.1
 --- !u!82 &1701187574368030398
 AudioSource:
   m_ObjectHideFlags: 0
