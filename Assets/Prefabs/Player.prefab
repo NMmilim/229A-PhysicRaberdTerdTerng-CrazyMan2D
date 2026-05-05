@@ -662,8 +662,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   rb: {fileID: 1295536183799850090}
-  speed: 5
-  jumpPower: 5
+  speed: 10
+  jumpPower: 7
   groundLayer:
     serializedVersion: 2
     m_Bits: 8

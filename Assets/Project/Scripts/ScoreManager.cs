@@ -33,7 +33,8 @@ public class ScoreManager : MonoBehaviour
     private Coroutine restartRoutine;
 
     private bool gameEnded = false;
-
+    public float CurrentTime => currentTime;
+    public float TimeLimit => timeLimit;
     void Awake()
     {
         if (Instance == null)
