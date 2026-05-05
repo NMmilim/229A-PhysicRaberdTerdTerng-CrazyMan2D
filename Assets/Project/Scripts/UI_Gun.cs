@@ -15,6 +15,7 @@ public class UI_Gun : MonoBehaviour
 
     void Start()
     {
+        ammoText.text = "6 / 6";
         reloadText.gameObject.SetActive(false);
     }
 
