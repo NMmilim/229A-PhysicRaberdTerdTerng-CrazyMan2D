@@ -682,11 +682,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 37feccbe-e579-47cd-a6c6-ced08d6c0ede
+  cloudProjectId: 33458af4-ce6a-4719-928e-c541ec9cc3b4
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project 2026-05-03_03-35-53
-  organizationId: namo5525633
+  projectName: Crazy Man 2D
+  organizationId: unity_8bf000a8c9788aff3f2d
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
